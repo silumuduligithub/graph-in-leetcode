@@ -1,0 +1,35 @@
+class Solution {
+    public int snakesAndLadders(int[][] board) {
+        int n = board.length;
+        boolean[][] vis = new boolean[n][n];
+        Queue<Integer> que = new LinkedList<>();
+        int moves = 0;
+        que.add(1);
+        vis[n - 1][0] = true;
+        while(que.size() > 0){
+            int size = que.size();
+            while(size -- > 0){
+                int front = que.remove();
+                if(front == (n * n))return moves;
+                for(int k = 1; k <= 6; k++){
+                    if((front + k) > (n * n))continue;
+                    int co[] = findCoordinates(front + k,n);
+                    int row = co[0];
+                    int col = co[1];
+                    if(vis[row][col])continue;
+                    vis[row][col] = true;
+                    if(board[row][col] == -1)que.add(front + k);
+                    else que.add(board[row][col]);
+                }
+            }
+            moves++;
+        }
+        return -1;
+    }
+    public int[] findCoordinates(int cur, int n){
+        int row = (n - (cur - 1)/ n) - 1;
+        int col = (cur - 1) % n;
+        if(row % 2 == n % 2)return new int[]{row, n - 1 - col};
+        else return new int[]{row, col};
+    }
+}
