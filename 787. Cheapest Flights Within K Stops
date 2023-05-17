@@ -1,0 +1,54 @@
+class Solution {
+    class Pair{
+        int nbr;
+        int cost;
+        Pair(int nbr, int cost){
+            this.nbr = nbr;
+            this.cost = cost;
+        }
+    }
+    class Helper{
+        int stop;
+        int nbr;
+        int cost;
+        Helper(int stop, int nbr, int cost){
+            this.stop = stop;
+            this.nbr = nbr;
+            this.cost = cost;
+        }
+    }
+    public List<List<Pair>> makeGraph(int n, int[][] flights){
+        List<List<Pair>> graph = new ArrayList<>();
+        for(int i = 0; i < n; i++)graph.add(new ArrayList<>());
+        for(int[] flight : flights){
+            int u = flight[0];
+            int v = flight[1];
+            int cost = flight[2];
+            graph.get(u).add(new Pair(v, cost));
+        }
+        return graph;
+    }
+    public int findCheapestPrice(int n, int[][] flights, int src, int dst, int k)   {
+        List<List<Pair>> graph = makeGraph(n, flights);
+        Queue<Helper> pq = new LinkedList<>();
+        int[] dist = new int[n];
+        Arrays.fill(dist, Integer.MAX_VALUE);
+        pq.add(new Helper(0, src, 0));
+        dist[src] = 0;
+        while(pq.size() > 0){
+            Helper h = pq.remove();
+            int stops = h.stop;
+            int nbr = h.nbr;
+            int cost = h.cost; 
+            if(stops > k)continue;
+            for(Pair p : graph.get(nbr)){
+                if((p.cost + cost) < dist[p.nbr] && stops <= k){
+                    dist[p.nbr] = p.cost + cost;
+                    pq.add(new Helper(stops + 1, p.nbr, dist[p.nbr]));
+                }
+            }
+        }
+        if(dist[dst] == Integer.MAX_VALUE)return -1;  
+        return dist[dst];
+    }
+}
