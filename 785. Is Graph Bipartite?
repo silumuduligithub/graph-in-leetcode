@@ -1,0 +1,31 @@
+class Solution {
+    public class Pair{
+        int node;
+        int color;
+        Pair(int node, int color){
+            this.node = node;
+            this.color = color;
+        }
+    }
+    public boolean isBipartite(int[][] graph) {
+        int[] vis = new int[graph.length];
+        Queue<Pair> que = new LinkedList<>();
+        for(int i = 0; i < graph.length; i++){
+            if(vis[i] != 0)continue;
+            que.add(new Pair(i, -1));
+            while(que.size() > 0){
+                Pair rpair = que.remove();
+                if(vis[rpair.node] != 0)continue;
+                vis[rpair.node] = rpair.color;
+                int oppColor = rpair.color == -1 ? 1 : -1;
+                for(int nbr : graph[rpair.node]){
+                    if(vis[nbr] == 0){
+                        que.add(new Pair(nbr, oppColor));
+                    }else if(vis[nbr] == rpair.color)return false;
+                    else continue;
+                }
+            }
+        }   
+        return true;
+    }
+}
