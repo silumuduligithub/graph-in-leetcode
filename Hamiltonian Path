@@ -1,0 +1,36 @@
+class Solution 
+{ 
+     boolean dfs(int src, ArrayList<ArrayList<Integer>> graph, boolean[] path, List<Integer> psf){
+        path[src] = true;
+        psf.add(src);
+        if(psf.size() == graph.size() - 1)return true;
+        for(int nbr : graph.get(src)){
+            if(!path[nbr]){
+                if(dfs(nbr, graph, path, psf))
+                    return true;
+            }
+        }
+        path[src] = false;
+        psf.remove(psf.size() - 1);
+        return false;
+    }
+    boolean check(int N, int M, ArrayList<ArrayList<Integer>> Edges) { 
+        ArrayList<ArrayList<Integer>> graph = new ArrayList<>();
+        for(int i = 0; i <= N; i++){
+            graph.add(new ArrayList<>());
+        }
+        for(ArrayList<Integer> edge : Edges){
+            int u = edge.get(0);
+            int v = edge.get(1);
+            graph.get(u).add(v);
+            graph.get(v).add(u);
+        }
+        boolean[] path = new boolean[N + 1];
+        List<Integer> psf = new ArrayList<>();
+        // return false;
+        for(int i = 1; i <= N; i++){
+            if(dfs(i, graph, path, psf))return true;
+        }
+        return false;
+    }
+} 
