@@ -1,0 +1,61 @@
+class Solution {
+    class Pair{
+        int row;
+        int col;
+        Pair(int row, int col){
+            this.row = row;
+            this.col = col;
+        }
+    }
+    public void dfs(int r, int c, int[][] grid, Queue<Pair> que){
+        if(r < 0 || r >= grid.length || c < 0 || c >= grid.length || grid[r][c] == -1 || grid[r][c] == 0)return ;
+        grid[r][c] = -1;
+        que.add(new Pair(r, c));
+        dfs(r - 1, c, grid, que);
+        dfs(r, c + 1, grid, que);
+        dfs(r + 1, c, grid, que);
+        dfs(r, c - 1, grid, que);
+    }
+    public int bfs(Queue<Pair> que,int[][] grid){
+        int ans = 0;
+        while(que.size() > 0){
+            int size = que.size();
+            int[] row = new int[]{-1, 0, 1, 0};
+            int[] col = new int[]{0, 1, 0, -1};
+            while(size-- > 0){
+                Pair cur = que.remove();
+                for(int i = 0; i < 4; i++){
+                    int nr = row[i] + cur.row;
+                    int nc = col[i] + cur.col;
+                    if(nr >= 0 && nr < grid.length && nc >= 0 && nc < grid.length){
+                        if(grid[nr][nc] == 0){
+                            que.add(new Pair(nr, nc));
+                            grid[nr][nc] = - 1;
+                        }else{
+                            if(grid[nr][nc] == 1)
+                                return ans;
+                        }
+                    }
+                }
+            }
+            ans++;
+        }
+        return ans;
+    }
+    public int shortestBridge(int[][] grid) {
+        Queue<Pair> que = new LinkedList<>();
+        boolean ok = true;
+        for(int i = 0; i < grid.length; i++){
+            if(ok){
+                for(int j = 0; j < grid.length; j++){
+                    if(grid[i][j] == 1){
+                        dfs(i, j, grid, que);
+                        ok = false;
+                        break;
+                    }
+                }
+            }
+        }
+        return bfs(que, grid);
+    }
+}
