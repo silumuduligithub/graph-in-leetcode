@@ -1,0 +1,30 @@
+class Solution {
+    int count = 0;
+    public void dfs(int cur, List<List<Integer>> graph, Set<Integer> set, boolean vis[]){
+        vis[cur] = true;
+        count++;
+        for(int nbr : graph.get(cur)){
+             if(!set.contains(nbr) && !vis[nbr])
+                dfs(nbr, graph, set, vis);
+        }
+    }
+    public List<List<Integer>> makeGraph(int n, int[][] edges){
+        List<List<Integer>> graph = new ArrayList<>();
+        for(int i = 0; i < n; i++)graph.add(new ArrayList<>());
+        for(int[] edge : edges){
+            int u = edge[0];
+            int v = edge[1];
+            graph.get(u).add(v);
+            graph.get(v).add(u);
+        }
+        return graph;
+    }
+    public int reachableNodes(int n, int[][] edges, int[] restricted) {
+        Set<Integer> set = new HashSet<>();
+        for(int r : restricted)set.add(r);
+        List<List<Integer>> graph = makeGraph(n, edges);
+        boolean[] vis = new boolean[n];
+        dfs(0, graph, set, vis);
+        return count;
+    }
+}
