@@ -1,0 +1,29 @@
+class Solution {
+    public List<List<Integer>> makeGraph(int n, int[][] edges){
+        List<List<Integer>> graph = new ArrayList<>();
+        for(int i = 0; i < n; i++)graph.add(new ArrayList<>());
+        for(int[] edge : edges){
+            int u = edge[0];
+            int v = edge[1];
+            graph.get(u).add(v);
+            graph.get(v).add(u);
+        }
+        return graph;
+    }
+    public boolean dfs(int cur, List<List<Integer>> graph, int dest, boolean[]vis){
+        vis[cur] = true;
+        for(int nbr : graph.get(cur)){
+            if(vis[nbr] == true)continue;
+            if(nbr == dest)return true;
+            boolean res = dfs(nbr, graph, dest, vis);
+            if(res == true)return true;
+        }
+        return false;
+    }
+    public boolean validPath(int n, int[][] edges, int source, int destination) {
+        if(source == destination)return true;
+        List<List<Integer>> graph = makeGraph(n, edges);
+        boolean[] vis = new boolean[n];
+        return dfs(source, graph, destination, vis);
+    }
+}
