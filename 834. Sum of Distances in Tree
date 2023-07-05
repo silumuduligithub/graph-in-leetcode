@@ -1,0 +1,41 @@
+class Solution {
+    public List<List<Integer>> makeGraph(int n, int[][] edges){
+        List<List<Integer>> graph = new ArrayList<>();
+        for(int i = 0; i < n; i++)graph.add(new ArrayList<>());
+        for(int[] edge : edges){
+            int u = edge[0];
+            int v = edge[1];
+            graph.get(u).add(v);
+            graph.get(v).add(u);
+        }
+        return graph;   
+    }
+    public void dfs(int cur, int parent, List<List<Integer>> graph, int[] count, int[] subTree){
+        for(int nbr : graph.get(cur)){
+            if(nbr != parent){
+                dfs(nbr, cur, graph, count, subTree);
+                count[cur] += count[nbr];
+                subTree[cur] += subTree[nbr] + count[nbr]; 
+            }
+        }
+        count[cur] += 1;
+    }
+    public void dfs2(int cur, int parent, int n, List<List<Integer>> graph, int[] ans, int[] count){
+        for(int nbr : graph.get(cur)){
+            if(nbr != parent){
+                ans[nbr] = ans[cur] - count[nbr] +(n - count[nbr]);
+                dfs2(nbr, cur, n, graph, ans, count);
+            }
+        }
+    }
+     public int[] sumOfDistancesInTree(int n, int[][] edges) {
+        List<List<Integer>> graph = makeGraph(n, edges);
+        int[] ans = new int[n];
+        int[] count = new int[n];
+        int[] subTree = new int[n];
+        dfs(0, -1, graph, count, subTree);
+        ans[0] = subTree[0];
+        dfs2(0, -1, n, graph, ans, count);
+        return ans;
+    }
+}
