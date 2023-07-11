@@ -1,0 +1,52 @@
+class Solution {
+    private class Pair implements Comparable<Pair>{
+        int node;
+        int wt;
+        Pair(int node, int wt){
+            this.node = node;
+            this.wt = wt;
+        }
+        public int compareTo(Pair o){
+            return o.wt - this.wt;
+        }
+    }
+    private int[][] makeGraph(int[][] edges, int n){
+        int[][] graph = new int[n][n];
+        for(int[] g : graph){
+            Arrays.fill(g, -1);
+        }
+        for(int[] edge : edges){
+            int u = edge[0];
+            int v = edge[1];
+            int wt = edge[2];
+           graph[u][v] = wt;
+           graph[v][u] = wt;
+        }
+        return graph;
+    }
+    public int reachableNodes(int[][] edges, int maxMoves, int n) {
+        int[][] graph = makeGraph(edges, n); 
+        PriorityQueue<Pair> pq = new PriorityQueue<>();
+        boolean[] vis = new boolean[n];
+        int ans = 0;
+        pq.add(new Pair(0, maxMoves));
+        while(pq.size() > 0){
+                Pair rpair = pq.remove();
+                if(vis[rpair.node])continue;
+                vis[rpair.node] = true;
+                ans++;
+                for(int nbr = 0; nbr < n; nbr++){
+                    if(graph[rpair.node][nbr] != -1){
+                        if(!vis[nbr] && rpair.wt >= graph[rpair.node][nbr] + 1){
+                            pq.add(new Pair(nbr, rpair.wt - graph[rpair.node][nbr] - 1));
+                        }
+                        int moves = Math.min(rpair.wt, graph[rpair.node][nbr]);
+                        graph[rpair.node][nbr] -= moves;
+                        graph[nbr][rpair.node] -= moves;
+                        ans += moves;
+                    }
+                }
+            }
+        return ans;
+    }
+}
