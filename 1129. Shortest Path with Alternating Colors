@@ -1,0 +1,37 @@
+class Solution {
+    // 0 means red, 1 means blue
+    public List[] builtGraph(int n, int[][] redEdges, int[][] blueEdges){
+        List[] graph = new ArrayList[n];
+        for(int i = 0; i < n; i++)graph[i] = new ArrayList<>();
+        for(int[] red : redEdges){
+            graph[red[0]].add(new int[]{red[1], 0});
+        }
+        for(int[] blue : blueEdges){
+            graph[blue[0]].add(new int[]{blue[1], 1});
+        }
+        return graph;
+    }
+    public int[] shortestAlternatingPaths(int n, int[][] redEdges, int[][] blueEdges) {
+        List[] graph = builtGraph(n, redEdges, blueEdges);
+        Queue<int[]> que = new LinkedList<>();
+        boolean[][] vis = new boolean[n][2];
+        int[] res = new int[n];
+        Arrays.fill(res, -1);
+        res[0] = 0;
+        que.add(new int[]{0, 0, -1});// node, distance, color
+        while(que.size() > 0){
+            int[] top = que.remove();
+            List<int[]> nodes = graph[top[0]];
+            for(int[] nbr : nodes){
+                if(!vis[nbr[0]][nbr[1]] && nbr[1] != top[2]){
+                    if(res[nbr[0]] == -1){
+                        res[nbr[0]] = top[1] + 1;
+                    }
+                    vis[nbr[0]][nbr[1]] = true;
+                    que.add(new int[]{nbr[0], top[1] + 1, nbr[1]});
+                }
+            }
+        }
+        return res;
+    }
+}
