@@ -1,0 +1,37 @@
+class Solution {
+    public boolean dfs(int src, int[][] graph, boolean[] vis, boolean[] path, boolean[] cyclicNodes){
+        vis[src] = true;
+        path[src] = true;
+        for(int nbr : graph[src]){
+            if(vis[nbr] && path[nbr]){
+                cyclicNodes[src] = true;
+                return true;
+            }
+            if(!vis[nbr]){
+                boolean isCyclePresentMyDearNbr = dfs(nbr, graph, vis, path, cyclicNodes);
+                if(isCyclePresentMyDearNbr == true){
+                    cyclicNodes[src] = true;
+                    return true;
+                }
+            }
+        }
+        path[src] = false;
+        return false;
+    }
+    public List<Integer> eventualSafeNodes(int[][] graph) {
+        int n = graph.length;
+        boolean[] vis = new boolean[n];
+        boolean[] path = new boolean[n];
+        boolean[] cyclicNodes = new boolean[n];
+        for(int i = 0; i < n; i++){
+            if(!vis[i]){
+                dfs(i, graph, vis, path, cyclicNodes);
+            }
+        }
+        List<Integer> ans = new ArrayList<>();
+        for(int i = 0; i < n; i++){
+            if(cyclicNodes[i] == false)ans.add(i);
+        }
+        return ans;
+    }
+}
