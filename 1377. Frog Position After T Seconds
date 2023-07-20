@@ -1,0 +1,29 @@
+class Solution {
+    public List<List<Integer>> buildGraph(int n, int[][] edges){
+        List<List<Integer>> graph  = new ArrayList<>();
+        for(int i = 0; i <= n; i++)graph.add(new ArrayList<>());
+        for(int[] edge : edges){
+            graph.get(edge[0]).add(edge[1]);
+            graph.get(edge[1]).add(edge[0]);
+        }
+        return graph;
+    }
+    public double dfs(int cur, List<List<Integer>> graph, int t, int target, boolean[] vis){
+        if(cur != 1 && graph.get(cur).size() == 1 || t == 0){
+            return cur == target ? 1 : 0;
+        }
+        vis[cur] = true;
+        double res = 0;
+        for(int nbr : graph.get(cur)){
+            if(!vis[nbr]){
+                res += dfs(nbr, graph, t - 1, target, vis);
+            }
+        }
+        return res / (graph.get(cur).size() - (cur != 1 ? 1 : 0));
+    }
+    public double frogPosition(int n, int[][] edges, int t, int target) {
+        if(n == 1 && t == 1 && target == 1)return (double)1;
+        List<List<Integer>> graph = buildGraph(n, edges);
+        return dfs(1, graph, t, target, new boolean[n + 1]);
+    }
+}
