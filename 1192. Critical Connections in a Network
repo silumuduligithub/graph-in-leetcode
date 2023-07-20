@@ -1,0 +1,41 @@
+class Solution {
+    int timer = 1;
+    private List<List<Integer>> buildGraph(int n, List<List<Integer>> connections){
+        List<List<Integer>> graph = new ArrayList<>();
+        for(int i = 0; i < n; i++)graph.add(new ArrayList<>());
+        for(List<Integer> connection : connections){
+            graph.get(connection.get(0)).add(connection.get(1));
+            graph.get(connection.get(1)).add(connection.get(0));
+        }
+        return graph;
+    }
+    private void dfs(int cur, int parent, List<List<Integer>> graph, boolean[] vis, int[] tin, int[] low, List<List<Integer>> ans){
+        vis[cur] = true;
+        tin[cur] = low[cur] = timer;
+        timer++;
+        for(int nbr : graph.get(cur)){
+            if(nbr == parent)continue;
+            if(!vis[nbr]){
+                dfs(nbr, cur, graph, vis, tin, low, ans);
+                low[cur] = Math.min(low[cur], low[nbr]);
+                if(low[nbr] > tin[cur]){
+                    List<Integer> bridge = new ArrayList<>();
+                    bridge.add(nbr);
+                    bridge.add(cur);
+                    ans.add(bridge);
+                }
+            }else{
+                low[cur] = Math.min(low[cur], low[nbr]);
+            }
+        }
+    }
+    public List<List<Integer>> criticalConnections(int n, List<List<Integer>> connections) {
+        List<List<Integer>> graph = buildGraph(n, connections);
+        boolean[] vis = new boolean[n];
+        int[] tin = new int[n];
+        int[] low = new int[n];
+        List<List<Integer>> ans = new ArrayList<>();
+        dfs(0, -1, graph, vis, tin, low, ans);
+        return ans;
+    }
+}
