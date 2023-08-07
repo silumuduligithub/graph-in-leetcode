@@ -1,0 +1,44 @@
+class Solution {
+    public List<List<Integer>> buildGraph(int[][] edges, int n){
+        List<List<Integer>> graph = new ArrayList<>();
+        for(int i = 0; i < n; i++){
+            graph.add(new ArrayList<>());
+        }
+        for(int[] edge : edges){
+            graph.get(edge[0]).add(edge[1]);
+            graph.get(edge[1]).add(edge[0]);
+        }
+        return graph;
+    }
+    public int countCompleteComponents(int n, int[][] edges) {
+        List<List<Integer>> graph = buildGraph(edges, n);
+        Queue<Integer> que = new LinkedList<>();
+        boolean[] vis = new boolean[n];
+        int count = 0;
+        for(int i = 0;i < n; i++){
+            if(vis[i])continue;
+            Set<Integer> set = new HashSet<>();
+            que.add(i);
+            set.add(i);
+            while(que.size() > 0){
+                int cur = que.remove();
+                if(vis[cur])continue;
+                vis[cur] = true;
+                for(int nbr : graph.get(cur)){
+                    if(!vis[nbr]){
+                        set.add(nbr);
+                        que.add(nbr);
+                    }
+                }
+            }
+           int size = set.size();
+           int requiredEdges = size * (size - 1);
+           int totalEdges = 0;
+           for(int v : set){
+               totalEdges += graph.get(v).size();
+           }
+           if(requiredEdges ==totalEdges)count++;
+        }
+        return count;
+    }
+}
