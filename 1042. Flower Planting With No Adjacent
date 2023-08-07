@@ -1,0 +1,39 @@
+class Solution {
+    List<List<Integer>> buildGraph(int[][] paths, int n){
+        List<List<Integer>> graph = new ArrayList<>();
+        for(int i = 0; i <= n; i++){
+            graph.add(new ArrayList<>());
+        }
+        for(int[] path : paths){
+            graph.get(path[0]).add(path[1]);
+            graph.get(path[1]).add(path[0]);
+        }
+        return graph;
+    }
+    public int[] gardenNoAdj(int n, int[][] paths) {
+        List<List<Integer>> graph = buildGraph(paths, n);
+        int[] color = new int[n];
+        Queue<Integer> que = new LinkedList<>();
+        for(int i = 1; i <= n; i++){
+            if(color[i - 1] != 0)continue;
+            color[i - 1] = 1;
+            que.add(i);
+            while(que.size() > 0){
+                int size = que.size();
+                while(size-- > 0){
+                    int cur = que.remove();
+                    for(int nbr : graph.get(cur)){
+                        if(color[nbr - 1] == 0 || color[nbr - 1] == color[cur - 1]){
+                            color[nbr - 1] = color[cur - 1] + 1;
+                            que.add(nbr);
+                        }
+                        if(color[nbr - 1] > 4){
+                            color[nbr - 1] %= 4;
+                        }
+                    }
+                }
+            }
+        }
+        return color;
+    }
+}
