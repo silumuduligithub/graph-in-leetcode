@@ -1,0 +1,23 @@
+class Solution {
+    public int []buildIndegree(int n, int[][] roads, int[][] directEdge){
+        int[] indegree = new int[n];
+        for(int[] r : roads){
+            indegree[r[0]]++;
+            indegree[r[1]]++;
+            directEdge[r[0]][r[1]] = 1;
+            directEdge[r[1]][r[0]] = 1;
+        }
+        return indegree;
+    }
+    public int maximalNetworkRank(int n, int[][] roads) {
+        int[][] directEdge = new int[n][n];
+        int[]indegree = buildIndegree(n, roads, directEdge);
+        int ans = Integer.MIN_VALUE;
+        for(int i = 0; i < n; i++){
+            for(int j = i + 1; j < n; j++){
+                ans = Math.max(ans, indegree[i] + indegree[j] - directEdge[i][j]);
+            }
+        }
+        return ans;
+    }
+}
