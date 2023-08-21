@@ -1,0 +1,43 @@
+class Solution
+{
+    public void dfs(int cur, ArrayList<ArrayList<Integer>> graph, boolean[] vis){
+        vis[cur] = true;
+        for(int nbr : graph.get(cur)){
+            if(!vis[nbr]){
+                dfs(nbr, graph, vis);
+            }
+        }
+    }
+    public boolean graphIsConnected(int n, ArrayList<ArrayList<Integer>> graph){
+        boolean[] vis = new boolean[n];
+        int node = -1;
+        for(int i = 0; i < graph.size(); i++){
+            if(graph.get(i).size() > 0){
+                node = i;
+                break;
+            }
+        }
+        if(node == -1)return true;// the list have no indegree that means it is a eulers path
+        dfs(node, graph, vis);
+        for(int i = 0; i < n; i++){
+            if(vis[i] == false && graph.get(i).size() > 0){
+                return false;
+            }
+        }
+        return true;
+    }
+    public int findPath(int n, ArrayList<ArrayList<Integer>> graph){
+        if(!graphIsConnected(n, graph))return 0;
+        int odd = 0;
+        for(int i = 0; i < graph.size(); i++){
+            if((graph.get(i).size() & 1) == 1)odd++;
+        }
+        if(odd > 2)return 0;
+        return odd == 0 ? 2 : 1;
+    }
+    public int isEularCircuitExist(int V, ArrayList<ArrayList<Integer>> adj)
+    {
+        // Code here
+        return findPath(V, adj);
+    }
+}
