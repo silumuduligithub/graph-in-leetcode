@@ -1,0 +1,25 @@
+class Solution {
+    public HashMap<String, PriorityQueue<String>> constructGraph(List<List<String>> tickets){
+        HashMap<String, PriorityQueue<String>> graph = new HashMap<>();
+        for(List<String> ticket : tickets){
+            PriorityQueue<String> pq = graph.getOrDefault(ticket.get(0), new PriorityQueue<>());
+            pq.add(ticket.get(1));
+            graph.put(ticket.get(0), pq);
+        }
+        return graph;
+    }
+    public void dfs(String src,  HashMap<String, PriorityQueue<String>> graph, List<String> ans){
+        PriorityQueue<String> pq = graph.get(src);
+        while(pq != null && pq.size() > 0){
+            String nbr = pq.remove();
+            dfs(nbr, graph, ans);
+        }
+        ans.add(0, src);
+    }
+    public List<String> findItinerary(List<List<String>> tickets) {
+        HashMap<String, PriorityQueue<String>> graph = constructGraph(tickets);
+        List<String> ans = new ArrayList<>();
+        dfs("JFK", graph, ans);
+        return ans;
+    }
+}
