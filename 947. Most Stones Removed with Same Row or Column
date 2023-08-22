@@ -1,0 +1,53 @@
+class Dsu{
+    int[] parent;
+    int[] rank;
+    Dsu(int n){
+        parent = new int[n];
+        rank = new int[n];
+        for(int i = 0; i < n; i++){
+            parent[i] = i;
+        }
+    }
+    public int findParent(int u){
+        if(parent[u] == u)return u;
+        return parent[u] = findParent(parent[u]);
+    }
+    public void unionByRank(int u, int v){
+        int alp_u = findParent(u);
+        int alp_v = findParent(v);
+        if(alp_u == alp_v)return;
+        if(rank[alp_u] < rank[alp_v]){
+            parent[alp_u] = alp_v;
+        }else if(rank[alp_v] < rank[alp_u]){
+            parent[alp_v] = alp_u;
+        }else{
+            parent[alp_v] = alp_u;
+            rank[alp_u]++;
+        }
+    }
+}
+class Solution {
+    public int removeStones(int[][] stones) {
+        int maxRow = 0, maxCol = 0;
+        for(int[] stone : stones){
+            maxRow = Math.max(maxRow, stone[0]);
+            maxCol = Math.max(maxCol, stone[1]);
+        }
+        Dsu dsu = new Dsu(maxRow + maxCol + 2);
+        HashMap<Integer, Integer> map = new HashMap<>();
+        for(int[] stone : stones){
+            int row = stone[0];
+            int col = stone[1] + maxRow + 1;
+            dsu.unionByRank(row, col);
+            map.put(row, 1);
+            map.put(col, 1);
+        }
+        int count = 0;
+        for(int key : map.keySet()){
+            if(dsu.findParent(key) == key){
+                count++;
+            }
+        }
+        return stones.length - count;
+    }
+}
