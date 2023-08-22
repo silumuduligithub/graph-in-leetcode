@@ -1,0 +1,39 @@
+lass Solution {
+    public List<List<Integer>> constructGraph(int n, int[][] courses){
+        List<List<Integer>> graph = new ArrayList<>();
+        for(int i = 0; i < n; i++){
+            graph.add(new ArrayList<>());
+        }
+        for(int[] course : courses){
+            graph.get(course[0]).add(course[1]);
+        }
+        return graph;
+    }
+    public void bfs(int cur, List<List<Integer>> graph, boolean[][] vis){
+        Queue<Integer> que = new LinkedList<>();
+        que.add(cur);
+        while(que.size() > 0){
+            int front = que.remove();
+            if(vis[cur][front])continue;
+            vis[cur][front] = true;
+            for(int nbr : graph.get(front)){
+                if(!vis[cur][nbr]){
+                    que.add(nbr);
+                }
+            }
+        }
+    }
+    public List<Boolean> checkIfPrerequisite(int numCourses, int[][] prerequisites, int[][] queries) {
+        List<List<Integer>> graph = constructGraph(numCourses, prerequisites);
+        boolean[][] vis = new boolean[numCourses][numCourses];
+        for(int i = 0; i < numCourses; i++){
+            bfs(i, graph, vis);
+        }
+        List<Boolean> ans = new ArrayList<>();
+        for(int[] query : queries){
+            if(vis[query[0]][query[1]]) ans.add(true) ;
+            else ans.add(false);
+        }
+        return ans;
+    }
+}
