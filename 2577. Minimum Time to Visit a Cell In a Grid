@@ -1,0 +1,49 @@
+class Solution {
+    class Helper implements Comparable<Helper>{
+        int row;
+        int col;
+        int cost;
+        Helper(int row, int col, int cost){
+            this.row = row;
+            this.col = col;
+            this.cost = cost;
+        }
+        public int compareTo(Helper h){
+            return this.cost - h.cost;
+        }
+    }
+    public boolean isValid(int[][] grid, int row, int col){
+        if(row < 0 || col < 0 || row >= grid.length || col >= grid[0].length)return false;
+        return true;
+    }
+    public int minimumTime(int[][] grid) {
+        PriorityQueue<Helper> pq = new PriorityQueue<>();        
+        int[][] direactions = new int[][]{{-1, 0},{0, 1},{1, 0}, {0, -1}};
+        boolean[][] vis = new boolean[grid.length][grid[0].length];
+        if(grid[0][1] > 1 && grid[1][0] > 1)return -1;
+        pq.add(new Helper(0, 0, 0));
+        while(pq.size() > 0){
+            Helper r = pq.remove();
+            if(vis[r.row][r.col])continue;
+            vis[r.row][r.col] = true;
+            if(r.row == grid.length - 1 && r.col == grid[0].length - 1)return r.cost;
+            for(int[] dir : direactions){
+                int nrow = dir[0] + r.row;
+                int ncol = dir[1] + r.col;
+                if(isValid(grid, nrow, ncol) == false || vis[nrow][ncol] == true){
+                    continue;
+                }if(r.cost + 1 >= grid[nrow][ncol]){
+                    pq.add(new Helper(nrow, ncol, r.cost + 1));
+                }else{
+                    int diff = grid[nrow][ncol] - r.cost;
+                    if((diff & 1) == 1){
+                        pq.add(new Helper(nrow, ncol, grid[nrow][ncol]));
+                    }else{
+                        pq.add(new Helper(nrow, ncol, grid[nrow][ncol] + 1));
+                    }
+                }
+            }
+        }
+        return -1;
+    }
+}
