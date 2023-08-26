@@ -1,0 +1,46 @@
+class Dsu{
+    int[] parent;
+    int[] rank;
+    Dsu(int n){
+        parent = new int[n];
+        rank = new int[n];
+        for(int i = 0; i < n; i++){
+            parent[i] = i;
+        }
+    }
+    public int findParent(int u){
+        if(parent[u] == u)return u;
+        return parent[u] = findParent(parent[u]);
+    }
+    public void unionByRank(int u, int v){
+        int alp_u = findParent(u);
+        int alp_v = findParent(v);
+        if(alp_u == alp_v)return;
+        if(rank[alp_u] < rank[alp_v]){
+            parent[alp_u] = alp_v;
+        }else if(rank[alp_v] < rank[alp_u]){
+            parent[alp_v] = alp_u;
+        }else{
+            parent[alp_v] = alp_u;
+            rank[alp_v] ++;
+        }
+    }
+}
+class Solution {
+    public boolean equationsPossible(String[] equations) {
+        Dsu dsu = new Dsu(26);
+        for(String eqn : equations){
+            if(eqn.charAt(1) == '='){
+                dsu.unionByRank(eqn.charAt(0) - 'a', eqn.charAt(3) - 'a');
+            }
+        }
+         for(String eqn : equations){
+            if(eqn.charAt(1) == '!'){
+                int alp_u = dsu.findParent(eqn.charAt(0) - 'a');
+                int alp_v = dsu.findParent(eqn.charAt(3) - 'a');
+                if(alp_u == alp_v)return false;
+            }
+        }
+        return true;
+    }
+}
