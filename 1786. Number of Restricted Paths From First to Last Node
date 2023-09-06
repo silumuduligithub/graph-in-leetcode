@@ -1,0 +1,67 @@
+class Solution {
+    class Pair implements Comparable<Pair>{
+        int node;
+        int wt;
+        Pair(int node, int wt){
+            this.node = node;
+            this.wt = wt;
+        }
+        public int compareTo(Pair o){
+            return this.wt - o.wt;
+        }
+    }
+    int count = 0;
+    public List<List<Pair>> constructGraph(int n, int[][] edges){
+        List<List<Pair>> graph = new ArrayList<>();
+        for(int i = 0; i <= n; i++){
+            graph.add(new ArrayList<>());
+        }
+        for(int[] edge : edges){
+            graph.get(edge[0]).add(new Pair(edge[1], edge[2]));
+            graph.get(edge[1]).add(new Pair(edge[0], edge[2]));
+        }
+        return graph;
+    }
+    public void bfs(int n, List<List<Pair>> graph, int[] dist){
+        PriorityQueue<Pair> pq = new PriorityQueue<>();
+        boolean[] vis = new boolean[n + 1];
+        int cost = 0;
+        boolean flag1 = false;
+        pq.add(new Pair(n, 0));
+        while(pq.size() > 0){
+            int size = pq.size();
+            while(size-- > 0){
+                Pair rpair = pq.remove();
+                if(vis[rpair.node])continue;
+                vis[rpair.node] = true;
+                dist[rpair.node] = rpair.wt;
+                for(Pair nbr : graph.get(rpair.node)){
+                    if(!vis[nbr.node]){
+                        pq.add(new Pair(nbr.node, rpair.wt + nbr.wt));
+                    }
+                }
+            }
+        }
+    }
+     int mod = 1000000000 + 7;
+    public long dfs(int cur, int n, List<List<Pair>> graph, int[] dist, long[] dp){
+        if(cur == n)return 1;
+        if(dp[cur] != -1)return dp[cur];
+        long ans = 0;
+        for(Pair nbr : graph.get(cur)){
+            if(dist[cur] > dist[nbr.node]){
+               ans = (ans + dfs(nbr.node, n, graph, dist, dp) % mod);
+            }
+        }
+        return dp[cur] = (ans % mod);
+    }
+    public int countRestrictedPaths(int n, int[][] edges) {
+        int[] dist = new int[n + 1];
+        List<List<Pair>> graph = constructGraph(n, edges);
+        bfs(n, graph, dist);
+        long[] dp = new long[n + 1];
+        Arrays.fill(dp, -1);
+        long ans = dfs(1, n, graph, dist, dp);
+        return(int) ans % mod;
+    }
+}
