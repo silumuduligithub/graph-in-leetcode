@@ -1,0 +1,32 @@
+class Solution {
+    public int memo(int mouse, int cat, int moves, int maxMoves, int[][] graph, Integer[][][] dp){
+        if(moves >= maxMoves)return 0;
+        if(cat == mouse)return 2;
+        if(mouse == 0)return 1;
+        if(dp[mouse][cat][moves] != null)return dp[mouse][cat][moves];
+        if((moves & 1) == 0){
+            boolean draw = false;
+            for(int nbr : graph[mouse]){
+                int ans = memo(nbr, cat, moves + 1, maxMoves, graph, dp);
+                if(ans == 1)return dp[mouse][cat][moves] = 1;
+                if(ans == 0) draw = true;
+            }
+            return dp[mouse][cat][moves] = draw ? 0 : 2;
+        }else{
+            boolean draw = false;
+            for(int nbr : graph[cat]){
+                if(nbr == 0)continue;
+                int ans = memo(mouse, nbr, moves + 1, maxMoves, graph, dp);
+                if(ans == 2)return dp[mouse][cat][moves] = 2;
+                if(ans == 0) draw = true;
+            }
+            return dp[mouse][cat][moves] = draw ? 0:  1;
+        }
+    }
+    public int catMouseGame(int[][] graph) {
+        int n = graph.length;
+        int moves = n * 4 + 10;
+        Integer[][][] storage = new Integer[n][n][moves];
+        return memo(1, 2, 0, moves, graph, storage);
+    }
+}
