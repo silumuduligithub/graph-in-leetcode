@@ -1,0 +1,46 @@
+class Solution {
+    public List<List<Integer>> builtGraph(int[][] richer, int n){
+        List<List<Integer>> graph = new ArrayList<>();
+        for(int i = 0; i < n; i++)graph.add(new ArrayList<>());
+        for(int[] rich : richer){
+            graph.get(rich[1]).add(rich[0]);
+        }
+        return graph;
+    }
+    boolean flag = true;
+    public int bfs(int cur, List<List<Integer>> graph, int[] quiet){
+        boolean[] vis = new boolean[quiet.length];
+       int ans = cur, minQuiet = quiet[cur];
+       Queue<Integer> que = new LinkedList<>();
+       que.add(cur);
+       while(que.size() > 0){
+           int size = que.size();
+           while(size-- > 0){
+               int front = que.remove();
+               if(vis[front])continue;
+               vis[front] = true;
+               if(minQuiet > quiet[front]){
+                   ans = front;
+                   minQuiet = quiet[front];
+               }
+               for(int nbr : graph.get(front)){
+                   if(!vis[nbr])
+                        que.add(nbr);
+               }
+           }
+       }
+       return ans;
+    }
+    public int[] loudAndRich(int[][] richer, int[] quiet) {
+        int n = quiet.length;
+        List<List<Integer>> graph = builtGraph(richer, n);
+        int[] ans = new int[n];
+        for(int i = 0; i < n; i++){
+            int curRes = i;
+            int res = bfs(i, graph, quiet);
+            flag = false;
+            ans[i] = res;
+        }
+        return ans;
+    }
+}
