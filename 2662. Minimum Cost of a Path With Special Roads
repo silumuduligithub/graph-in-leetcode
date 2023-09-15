@@ -1,0 +1,119 @@
+class Solution {
+    class Pair implements Comparable<Pair>{
+        int nbr;
+        int wt;
+        Pair(int nbr, int wt){
+            this.nbr = nbr;
+            this.wt = wt;
+        }
+        public int compareTo(Pair o){
+            return this.wt - o.wt;
+        }
+    }
+    public int bfs(int src, List<List<Pair>> graph, int target){
+        PriorityQueue<Pair> pq = new PriorityQueue<>();
+        boolean[] vis = new boolean[graph.size()];
+        pq.add(new Pair(src, 0));
+        while(pq.size() > 0){
+            int size = pq.size();
+            while(size-- > 0){
+                Pair rpair = pq.remove();
+                if((rpair.nbr) == target)return rpair.wt;
+                if(vis[rpair.nbr])continue;
+                vis[rpair.nbr] = true;
+                for(Pair nbr : graph.get(rpair.nbr)){
+                    if(!vis[nbr.nbr])   
+                        pq.add(new Pair(nbr.nbr, nbr.wt + rpair.wt));
+                }
+            }
+        }
+        return -1;
+    }
+    int dest = 0;
+    public List<List<Pair>> constructGraph(int[] start, int[] target, int[][] specialRoads){
+        HashMap<String, Integer> roadMap = new HashMap<>();
+        for(int [] road : specialRoads){
+            int x1 = road[0];
+            int y1 = road[1];
+            int x2 = road[2];
+            int y2 = road[3];
+            int cost = Math.abs(x1 - x2) + Math.abs(y1 - y2);
+            int specialCost = road[4];
+            if(cost < specialCost){
+                specialCost = cost;
+            }
+            String str = x1 +" "+y1 +" "+x2 +" "+y2;
+            if(roadMap.containsKey(str)){
+                if(roadMap.get(str) > specialCost)
+                    roadMap.put(str, specialCost);
+                else 
+                    continue;
+            }else{
+                roadMap.put(str, specialCost);
+            }
+        }
+        System.out.println(roadMap.get(1+" "+1+" "+1+" "+3));
+        HashMap<Integer, String> map = new HashMap<>();
+        Set<String> set = new HashSet<>();
+        HashMap<String, Integer> specialMap = new HashMap<>();
+        int count = 0;
+        map.put(count, start[0]+" "+start[1]);
+        set.add(start[0]+" "+start[1]);
+        count++;
+        String dstr = target[0] + " "+target[1];
+        for(String key : roadMap.keySet()){
+            String[] road = key.split(" ");
+            String str1 = road[0]+" "+road[1];
+            String str2 = road[2]+" "+road[3];
+            String special = str1+" "+str2;
+            specialMap.put(special, roadMap.get(key));
+            if(!set.contains(str1)){
+                if(str1.equals(dstr)){
+                    dest = count;
+                }
+                map.put(count, str1);
+                set.add(str1);
+                count++;
+            }
+            if(!set.contains(str2)){
+                if(str2.equals(dstr)){
+                    dest = count;
+                }
+                map.put(count, str2);
+                set.add(str2);
+                count++;
+            }
+        }
+        if(!set.contains(dstr)){
+            map.put(count, dstr);
+            dest = count;
+            count++;
+        }
+        List<List<Pair>> graph = new ArrayList<>();
+        for(int i = 0; i < count; i++){
+            graph.add(new ArrayList<>());
+        }
+        for(int i = 0; i < count; i++){
+            for(int j = 0; j < count; j++){
+                String str1 = map.get(i);
+                String str2 = map.get(j);
+                String specialRoad = str1 +" "+str2;
+                if(specialMap.containsKey(specialRoad)){
+                    String[] s1 = str1.split(" ");
+                    String[] s2 = str2.split(" ");
+                    graph.get(i).add(new Pair(j, specialMap.get(specialRoad)));
+                }else{
+                    String[] s1 = str1.split(" ");
+                    String[] s2 = str2.split(" ");
+                    int cost =Math.abs(Integer.parseInt(s2[0]) - Integer.parseInt(s1[0]))+ Math.abs(Integer.parseInt(s2[1]) - Integer.parseInt(s1[1]));
+                    graph.get(i).add(new Pair(j, cost));
+                }
+            }
+        }
+        return graph;
+    }
+    public int minimumCost(int[] start, int[] target, int[][] specialRoads) {
+       List<List<Pair>> graph = constructGraph(start, target, specialRoads);
+       return bfs(0, graph, dest);
+    }
+}
