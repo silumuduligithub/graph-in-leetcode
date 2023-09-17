@@ -1,0 +1,112 @@
+class Solution {
+    class DsuAlice{
+        int[] parent;
+        int[] rank;
+        DsuAlice(int n){
+            parent = new int[n];
+            rank = new int[n];
+            for(int i = 0; i < n; i++)parent[i] =i;
+        }
+        public int findParent(int u){
+            if(parent[u] == u)return u;
+            return parent[u] = findParent(parent[u]);
+        }
+        public boolean unionByRank(int u, int v){
+            int alp_u = findParent(u);
+            int alp_v = findParent(v);
+            if(alp_u == alp_v)return true;
+            if(rank[alp_u] < rank[alp_v]){
+                parent[alp_u] = parent[alp_v];
+            }else if(rank[alp_v] < rank[alp_u]){
+                parent[alp_v] = parent[alp_u];
+            }else{
+                parent[alp_u] = parent[alp_v];
+                rank[alp_v]++;
+            }
+            return false;
+        }
+    }
+
+    class DsuBob{
+        int[] parent;
+        int[] rank;
+        DsuBob(int n){
+            parent = new int[n];
+            rank = new int[n];
+            for(int i = 0; i < n; i++)parent[i] =i;
+        }
+        public int findParent(int u){
+            if(parent[u] == u)return u;
+            return parent[u] = findParent(parent[u]);
+        }
+        public boolean unionByRank(int u, int v){
+            int alp_u = findParent(u);
+            int alp_v = findParent(v);
+            if(alp_u == alp_v)return true;
+            if(rank[alp_u] < rank[alp_v]){
+                parent[alp_u] = parent[alp_v];
+            }else if(rank[alp_v] < rank[alp_u]){
+                parent[alp_v] = parent[alp_u];
+            }else{
+                parent[alp_u] = parent[alp_v];
+                rank[alp_v]++;
+            }
+            return false;
+        }
+    }
+    class Pair{
+        int u;
+        int v;
+        Pair(int u, int v){
+            this.u = u;
+            this.v = v;
+        }
+    }
+    public int maxNumEdgesToRemove(int n, int[][] edges) {
+        List<Pair> maximumPriorityEdges = new ArrayList<>();
+        DsuAlice dsuAlice = new DsuAlice(n + 1);
+        DsuAlice dsuBob = new DsuAlice(n + 1);
+        for(int[] edge : edges){
+            if(edge[0] == 3){
+                maximumPriorityEdges.add(new Pair(edge[1], edge[2]));
+            }
+        }
+        int size = maximumPriorityEdges.size(), i = 0;
+        int priorityEdges = 0, removeEdges = 0, bobEdges = 0, aliceEdges = 0;
+        while(i < size){
+            int u = maximumPriorityEdges.get(i).u;
+            int v = maximumPriorityEdges.get(i).v;
+            if(dsuAlice.unionByRank(u, v)){
+                removeEdges++;
+            }else{
+                dsuAlice.unionByRank(u, v);
+                dsuBob.unionByRank(u, v);
+                priorityEdges++;
+            }
+            i++;
+        }
+        for(int[] edge : edges){
+            int u = edge[1];
+            int v = edge[2];
+            int type = edge[0];
+            if(type == 1){
+                if(dsuAlice.unionByRank(u, v)){
+                    removeEdges++;
+                }else{
+                    dsuAlice.unionByRank(u, v);
+                    aliceEdges++;
+                }
+            }
+            if(type == 2){
+                if(dsuBob.unionByRank(u, v)){
+                    removeEdges++;
+                }else{
+                    dsuBob.unionByRank(u, v);
+                    bobEdges++;
+                }
+            }
+        }
+        if((priorityEdges + aliceEdges) != n - 1 || (priorityEdges + bobEdges) != n - 1)return -1;
+        return removeEdges;
+    }
+}
