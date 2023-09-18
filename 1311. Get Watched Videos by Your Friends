@@ -1,0 +1,58 @@
+class Solution {
+    class Pair implements Comparable<Pair>{
+        String str;
+        int freq;
+        Pair(String str, int freq){
+            this.str = str;
+            this.freq = freq;
+        }
+        public int compareTo(Pair o){
+            if(this.freq == o.freq)return this.str.compareTo(o.str);
+            return this.freq - o.freq;
+        }
+    }
+    public List<Integer> bfs(int[][] friends, int id, int level){
+        Queue<Integer> que = new LinkedList<>();
+        boolean[] vis = new boolean[friends.length];
+        List<Integer> videos = new ArrayList<>();
+        que.add(id);
+        while(que.size() != 0){
+            int size = que.size();
+            while(size-- > 0){
+                int cur = que.remove();
+                if(vis[cur])continue;
+                vis[cur] = true;
+                if(level == 0){
+                    videos.add(cur);
+                }
+                for(int nbr : friends[cur]){
+                    if(!vis[nbr])
+                        que.add(nbr);
+                }
+            }
+            level--;
+        }
+        return videos;
+    }
+    public List<String> watchedVideosByFriends(List<List<String>> watchedVideos, int[][] friends, int id, int level) {
+        List<Integer> al = bfs(friends, id, level);
+        HashMap<String, Integer> map = new HashMap<>();
+        for(int num : al){
+            for(String key : watchedVideos.get(num)){
+                map.put(key, map.getOrDefault(key, 0) + 1);
+            }
+        }
+        Pair[] arr = new Pair[map.size()];
+        int i = 0;
+        for(String s : map.keySet()){
+            arr[i] = new Pair(s, map.get(s));
+            i++;
+        }
+        Arrays.sort(arr);
+        List<String> ans = new ArrayList<>();
+        for(Pair rpair : arr){
+            ans.add(rpair.str);
+        }
+        return ans;
+    }
+}
