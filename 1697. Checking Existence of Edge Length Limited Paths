@@ -1,0 +1,83 @@
+class Solution {
+    class Dsu{
+        int[] parent;
+        int[] rank;
+        Dsu(int n){
+            parent = new int[n];
+            rank = new int[n];
+            for(int i = 0; i < n; i++){
+                parent[i] = i;
+            }
+        }
+        public int findParent(int u){
+            if(parent[u] == u)return u;
+            return parent[u] = findParent(parent[u]);
+        }
+        public void unionByRank(int u, int v){
+            int alp_u = findParent(u);
+            int alp_v = findParent(v);
+            if(alp_u == alp_v)return;
+            if(rank[alp_u] < rank[alp_v]){
+                parent[alp_u] = alp_v;
+            }else if(rank[alp_v] < rank[alp_u]){
+                parent[alp_v] = alp_u;
+            }else{
+                parent[alp_u] = alp_v;
+                rank[alp_v]++;
+            }
+        }
+    }
+    class Pair1 implements Comparable<Pair1>{
+        int v;
+        int u;
+        int wt;
+        Pair1(int u, int v, int wt){
+            this.u = u;
+            this.v = v;
+            this.wt = wt;
+        }
+        public int compareTo(Pair1 o){
+            return this.wt - o.wt;
+        }
+    }
+    class Pair2 implements Comparable<Pair2>{
+        int v;
+        int u;
+        int wt;
+        int idx;
+        Pair2(int u, int v, int wt, int idx){
+            this.u = u;
+            this.v = v;
+            this.wt = wt;
+            this.idx = idx;
+        }
+        public int compareTo(Pair2 o){
+            return this.wt - o.wt;
+        }
+    }
+    public boolean[] distanceLimitedPathsExist(int n, int[][] edgeList, int[][] queries){
+        Dsu dsu = new Dsu(n);
+        Pair1[] edges = new Pair1[edgeList.length];
+        Pair2[] querys = new Pair2[queries.length];
+        boolean[] ans = new boolean[queries.length];
+        for(int i = 0; i < edgeList.length; i++){
+            edges[i] = new Pair1(edgeList[i][0], edgeList[i][1], edgeList[i][2]);
+        }
+        for(int i = 0; i < queries.length; i++){
+            querys[i] = new Pair2(queries[i][0], queries[i][1], queries[i][2], i);
+        }
+        Arrays.sort(edges);
+        Arrays.sort(querys);
+        int edgeIdx = 0;
+        for(Pair2 query : querys){
+            while(edgeIdx < edgeList.length && edges[edgeIdx].wt < query.wt){
+                dsu.unionByRank(edges[edgeIdx].u, edges[edgeIdx].v);
+                edgeIdx++;
+            }
+            if(dsu.findParent(query.u) == dsu.findParent(query.v)){
+                ans[query.idx] = true;
+            }
+        }
+        return ans;
+    }
+}
