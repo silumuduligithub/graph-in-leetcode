@@ -1,0 +1,28 @@
+class Solution {
+    public int[][] constructIndegreeAndGraph(int n, int[][] edges, int[] indegree){
+        int[][] graph = new int[n + 1][n + 1];
+        for(int[] edge : edges){
+            graph[edge[0]][edge[1]] = 1;
+            graph[edge[1]][edge[0]] = 1;
+            indegree[edge[0]]++;
+            indegree[edge[1]]++;
+        }
+        return graph;
+    }
+    public int minTrioDegree(int n, int[][] edges) {
+        int[] indegree =new int[n + 1];
+        int[][] graph = constructIndegreeAndGraph(n, edges, indegree);
+        int ans = Integer.MAX_VALUE;
+        for(int i = 1; i <= n; i++){
+            for(int j = i; j <= n; j++){
+                for(int k = j; k <= n; k++){
+                    if(graph[i][j] == 1 && graph[j][k] == 1 && graph[k][i] == 1){
+                        int curIndegrees = indegree[i] + indegree[j] + indegree[k] - 6;
+                        ans = Math.min(ans, curIndegrees);
+                    }
+                }
+            }
+        }
+        return ans == Integer.MAX_VALUE ? -1 : ans;
+    }
+}
