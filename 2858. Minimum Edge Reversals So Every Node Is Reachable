@@ -1,0 +1,49 @@
+class Solution {
+    class Pair{
+        int node;
+        int cost;
+        Pair(int node, int cost){
+            this.node = node;
+            this.cost = cost;
+        }
+    }
+    public List<List<Pair>> constructGraph(int n, int[][] edges){
+        List<List<Pair>> graph = new ArrayList<>();
+        for(int i = 0; i < n; i++){
+            graph.add(new ArrayList<>());
+        }
+        for(int [] edge : edges){
+            graph.get(edge[0]).add(new Pair(edge[1], 0));
+            graph.get(edge[1]).add(new Pair(edge[0], 1));
+        }
+        return graph;
+    }
+    int ersn;
+    public void dfs(int curNode, List<List<Pair>> graph, boolean[] vis, int[] edgeReverse, int d, int[] depth){
+        vis[curNode] = true;
+        depth[curNode] = d;
+        for(Pair nbr : graph.get(curNode)){
+            if(!vis[nbr.node]){
+                edgeReverse[nbr.node] = edgeReverse[curNode] + nbr.cost;
+                ersn += nbr.cost;
+                dfs(nbr.node, graph, vis, edgeReverse, d + 1, depth);
+            }
+        }
+    }
+    public int[] minEdgeReversals(int n, int[][] edges) {
+        List<List<Pair>> graph = constructGraph(n, edges);
+        boolean[] vis = new boolean[n];
+        int[] ans = new int[n];
+        int[] edgeReverse = new int[n];
+        int[] depth = new int[n];
+        ersn = 0;// edge reverse starting node;
+        dfs(0, graph, vis, edgeReverse, 0, depth);
+        ans[0] = ersn;
+        for(int i = 1; i < n; i++){
+            int value1 = depth[i] - edgeReverse[i];
+            int value2 = ersn - edgeReverse[i];
+            ans[i] = value1 + value2;
+        }
+        return ans;
+    }
+}
