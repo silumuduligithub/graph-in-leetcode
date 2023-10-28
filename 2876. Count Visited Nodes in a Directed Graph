@@ -1,0 +1,50 @@
+// in this question we can use topo sort to remove the cycles and store that nodes which have no cycle after
+// after removeing the nodes now we only that nodes which have cycles
+// at last calculet the lenght which have cycle and the nodes present in same cycly the length must be same 
+//and the nodes that not belongs to any cycle that menas that nodes have length = 1 + that child node
+class Solution {
+    public void fillCycle(int idx, boolean[] vis, List<Integer> edges, int[] ans){
+        int length = 0;
+        for(int i = idx; !vis[i]; i = edges.get(i)){
+            vis[i] = true;
+            length++;
+        }
+        ans[idx] = length;
+         for(int i = edges.get(idx); i != idx; i = edges.get(i)){
+            ans[i] = length;
+        }
+    }
+    public int[] countVisitedNodes(List<Integer> edges) {
+        int n = edges.size();
+        int[] indegree = new int[n];
+        for(int i = 0; i < n; i++){
+            indegree[edges.get(i)]++;
+        }
+        Queue<Integer> que = new LinkedList<>();
+        boolean[] vis = new boolean[n];
+        for(int i = 0; i < n; i++){
+            if(indegree[i] == 0)que.add(i);
+        }
+        Stack<Integer> st = new Stack<>();
+        while(que.size() > 0){
+            int front = que.remove();
+            vis[front] = true;
+            st.push(front);
+            indegree[edges.get(front)]--;
+            if(indegree[edges.get(front)] == 0){
+                que.add(edges.get(front));
+            }
+        }
+        int[] ans = new int[n];
+        for(int i = 0; i < n; i++){
+            if(!vis[i]){
+                fillCycle(i, vis, edges, ans);
+            }
+        }
+        while(st.size() > 0){
+            int front = st.pop();
+            ans[front] = ans[edges.get(front)] + 1;
+        }
+        return ans;
+    }
+}
