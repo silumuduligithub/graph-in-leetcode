@@ -1,0 +1,36 @@
+class Solution {
+    public HashMap<Integer, List<Integer>> constructGraph(int[][] adj){
+        HashMap<Integer, List<Integer>> graph = new HashMap<>();
+        for(int[] edge : adj){
+            List<Integer> l1 = graph.getOrDefault(edge[0], new ArrayList<>());
+            l1.add(edge[1]);
+            graph.put(edge[0], l1);
+             List<Integer> l2 = graph.getOrDefault(edge[1], new ArrayList<>());
+            l2.add(edge[0]);
+            graph.put(edge[1], l2);
+        }
+        return graph;
+    }
+    public void dfs(int cur, HashMap<Integer, List<Integer>> graph, Set<Integer> vis, int[] ans, int idx){
+        if(vis.contains(cur))return;
+        vis.add(cur);
+        ans[idx] = cur;
+        List<Integer> nbrs = graph.get(cur);
+        for(int nbr : nbrs){
+            if(!vis.contains(nbr))dfs(nbr, graph, vis, ans, idx + 1);
+        }
+    }
+    public int[] restoreArray(int[][] adjacentPairs) {
+        HashMap<Integer, List<Integer>> graph = constructGraph(adjacentPairs);
+        int start = 0;
+        for(int key : graph.keySet()){
+            if(graph.get(key).size() == 1){
+                start = key;
+                break;
+            }
+        }
+        int[] ans = new int[graph.size()];
+        dfs(start, graph, new HashSet<Integer>(), ans, 0);
+        return ans;
+    }
+}
