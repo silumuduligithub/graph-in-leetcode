@@ -1,0 +1,106 @@
+class Solution {
+    // 0 means red 1 means green
+    class Pair{
+        int node;
+        int color;
+        Pair(int node, int color){
+            this.node = node;
+            this.color = color;
+        }
+    }
+    public List<List<Integer>> contstructGraph(int n, int[][] edges){
+        List<List<Integer>> graph = new ArrayList<>();
+        for(int i = 0; i <= n; i++){
+            graph.add(new ArrayList<>());
+        }
+        for(int[] edge : edges){
+            graph.get(edge[0]).add(edge[1]);
+            graph.get(edge[1]).add(edge[0]);
+        }
+        return graph;
+    }
+    public boolean isBipartate(int n, List<List<Integer>> graph){
+        Queue<Pair> que = new LinkedList<>();
+        int[] vis = new int[n + 1];
+        que.add(new Pair(1, 0));
+        while(que.size() > 0){
+            int size = que.size();
+            while(size-- > 0){
+                Pair rpair = que.remove();
+                if(vis[rpair.node] != 0)continue;
+                vis[rpair.node] = rpair.color;
+                int oppColor = rpair.color == 1 ? 2 : 1;
+                for(int nbr : graph.get(rpair.node)){
+                    if(vis[nbr] == 0){
+                        que.add(new Pair(nbr, oppColor));
+                    }else if(vis[nbr] == rpair.color){
+                            return false;
+                    }else{
+                        continue;
+                    }   
+                }
+            }
+        }
+        return true;
+    }
+    public int bfs(List<List<Integer>> graph, int n,  HashMap<Integer, List<Integer>> components){
+        int ans = 0;
+        for(int key : components.keySet()){
+            List<Integer> comp = components.get(key);
+            int curAns = 0;
+            for(int c : comp){
+                int tempAns = 0;
+                boolean[] vis = new boolean[n + 1];
+                Queue<Integer> que = new LinkedList<>();
+                que.add(c);
+                while(que.size() > 0){
+                    int size = que.size();
+                    while(size-- > 0){
+                        int cur = que.remove();
+                        if(vis[cur])continue;
+                        vis[cur] = true;
+                        for(int nbr : graph.get(cur)){
+                            if(!vis[nbr]){
+                                que.add(nbr);
+                            }
+                        }
+                    }
+                    tempAns++;
+                }
+                curAns = Math.max(curAns, tempAns);
+            }
+            ans += curAns;
+        }
+        return ans;
+    }
+    public HashMap<Integer, List<Integer>> conntectedComponents(int n, List<List<Integer>> graph){
+        Queue<Integer> que = new LinkedList<>();
+        HashMap<Integer, List<Integer>> components = new HashMap<>();
+        boolean[] vis = new boolean[n + 1];
+        for(int i = 1; i <= n; i++){
+            if(vis[i])continue;
+            que.add(i);
+            while(que.size() > 0){
+                int cur = que.remove();
+                if(vis[cur])continue;
+                vis[cur] = true;
+                List<Integer> comp = components.getOrDefault(i, new ArrayList<>());
+                comp.add(cur);
+                components.put(i, comp);
+                for(int nbr : graph.get(cur)){
+                    if(!vis[nbr])que.add(nbr);
+                }
+            }
+        }
+        return components;
+    }
+    public int magnificentSets(int n, int[][] edges) {
+        List<List<Integer>> graph = contstructGraph(n, edges);
+        for(int i = 1; i <= n; i++){
+            boolean flag = isBipartate(n, graph);
+            if(!flag)return -1;
+        }
+        HashMap<Integer, List<Integer>> components =  conntectedComponents(n, graph);
+        return bfs(graph, n, components);
+    }
+}
