@@ -1,0 +1,38 @@
+class Solution {
+    class Pair{
+        int node;
+        int wt;
+        Pair(int node, int wt){
+            this.node = node;
+            this.wt = wt;
+        }
+    }
+    public List<List<Pair>> constructGraph(int[][] edges, int n){
+        List<List<Pair>> graph = new ArrayList<>();
+        for(int i = 0; i < n; i++)graph.add(new ArrayList<>());
+        for(int[] edge : edges){
+            graph.get(edge[0]).add(new Pair(edge[1], edge[2]));
+            graph.get(edge[1]).add(new Pair(edge[0], edge[2]));
+        }
+        return graph;
+    }
+    int ans = 0;
+    public void dfs(int curNode, int curTime, int curAns, int maxTime,  List<List<Pair>> graph, int[] values){
+        if(curTime > maxTime)return;
+        curAns += values[curNode];
+        if(curNode == 0){
+            ans = Math.max(ans, curAns);
+        }
+        int temp = values[curNode];
+        values[curNode] = 0;
+        for(Pair nbr : graph.get(curNode)){
+            dfs(nbr.node, curTime + nbr.wt, curAns, maxTime, graph, values);
+        }
+        values[curNode] = temp;
+    }
+    public int maximalPathQuality(int[] values, int[][] edges, int maxTime) {
+        List<List<Pair>> graph = constructGraph(edges, values.length);
+        dfs(0, 0, 0, maxTime, graph, values);
+        return ans;
+    }
+}
